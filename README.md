@@ -9,7 +9,11 @@ Execute composer command.
 
 # Preparation
 
-First of all, you need to set `ClampBoltTrait` into your model like so.
+First of all, execute `migrate` command from the package.
+
+    php artisan migrate --package="sukohi/clamp-bolt"
+
+And you need to set `ClampBoltTrait` into your model like so.
 
     use Sukohi\ClampBolt\ClampBoltTrait;
     
