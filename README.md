@@ -76,6 +76,41 @@ Now you can use new methods called `attach` and `detach` with your model.
 
     $item->detach(1, true);
 
+[In iterator]: 
+
+    $item = Item::find(1);
+    
+    foreach ($item->attachments as $attachment) {
+    
+        $remove_file = true;
+        $attachment->delete($remove_file);
+    
+    }
+
+**Retrieve attachment data**
+
+You can get attachment data through an attribute called `attachments`.
+
+    $item = Item::find(1);
+
+    foreach ($item->attachments as $attachment) {
+    
+        echo $attachment->id;
+        echo $attachment->model;
+        echo $attachment->model_id;
+        echo $attachment->path;
+        echo $attachment->filename;
+        echo $attachment->full_path;
+        echo $attachment->extension;
+        echo $attachment->mime_type;
+        echo $attachment->size;
+        echo $attachment->parameters;
+        echo $attachment->created_at;
+        echo $attachment->updated_at;
+        echo $attachment->parameters;   // Here is array.
+    
+    }
+
 # When attached/detached?
 
 When called save(), attachment or detachment will be executed.
