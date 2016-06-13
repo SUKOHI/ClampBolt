@@ -6,7 +6,7 @@ A Laravel package to attach/detach files to/from model.
 
 Execute composer command.
 
-    composer update sukohi/clamp-bolt:2.*
+    composer require sukohi/clamp-bolt:2.*
 
 Register the service provider in app.php
 
