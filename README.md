@@ -121,6 +121,8 @@ You can get attachment data through an attribute called `attachments`.
     $filenames = $item->attachment_filenames;
     $paths = $item->attachment_paths;
 
+* If you use "dot-notion" like `array_key.0` for attachment key, `attachment_filenames` and `attachment_paths` attributes return multi-dimensional array.
+
 **Unneeded Files**
 
 If there are unneeded files after attaching, detaching or deleting, you can get file paths with key.

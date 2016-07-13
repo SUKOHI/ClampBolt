@@ -224,7 +224,8 @@ trait ClampBoltTrait {
 
 	public function getAttachmentFilenamesAttribute() {
 
-		return $this->attachments->lists('filename', 'key')->all();
+		$filenames = $this->attachments->lists('filename', 'key')->all();
+		return $this->convertMultiDimensionalArray($filenames);
 
 	}
 
@@ -240,13 +241,47 @@ trait ClampBoltTrait {
 
 		}
 
-		return $paths;
+		return $this->convertMultiDimensionalArray($paths);
 
 	}
 
 	public function getUnneededFilePathsAttribute() {
 
-		return $this->clamp_bolt_unneeded_paths;
+		return $this->convertMultiDimensionalArray($this->clamp_bolt_unneeded_paths);
+
+	}
+
+	private function convertMultiDimensionalArray(array $values) {
+
+		$array = [];
+
+		foreach ($values as $key => $value) {
+
+			if(strpos($key, '.') !== false) {
+
+				$array_keys = explode('.', $key);
+				$json_key = '__KEY_VALUE__';
+				$json_str = $json_key;
+
+				foreach ($array_keys as $array_key) {
+
+					$json_str = str_replace($json_key, '{"'. $array_key .'":'. $json_key .'}', $json_str);
+
+				}
+
+				$json_str = str_replace($json_key, '"'. $value .'"', $json_str);
+				$sub_array = json_decode($json_str, true);
+				$array = array_replace_recursive($array, $sub_array);
+
+			} else {
+
+				$array[$key] = $value;
+
+			}
+
+		}
+
+		return $array;
 
 	}
 
