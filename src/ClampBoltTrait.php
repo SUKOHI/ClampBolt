@@ -224,7 +224,7 @@ trait ClampBoltTrait {
 
 	public function getAttachmentFilenamesAttribute() {
 
-		return $this->attachments->lists('filename', 'id')->all();
+		return $this->attachments->lists('filename', 'key')->all();
 
 	}
 
@@ -234,9 +234,9 @@ trait ClampBoltTrait {
 
 		foreach ($this->attachments as $index => $attachment) {
 
-			$id = $attachment->id;
+			$key = $attachment->key;
 			$path = $attachment->full_path;
-			$paths[$id] = $path;
+			$paths[$key] = $path;
 
 		}
 
