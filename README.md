@@ -6,7 +6,7 @@ A Laravel package to attach/detach files to/from model.
 
 Execute composer command.
 
-    composer require sukohi/clamp-bolt:2.*
+    composer require sukohi/clamp-bolt:3.*
 
 Register the service provider in app.php
 
@@ -42,16 +42,24 @@ Now you can use new methods called `attach` and `detach` with your model.
 [Basic way]:  
     
     $item = Item::find(1);
-    $item->attach('/PATH/TO/YOUR/FILE');
+    $item->attach('attachment_key', '/PATH/TO/YOUR/FILE');
     $item->save();
 
-[Multiple way]: You can call `attach()` repeatedly.  
+[Multiple way]:  
 
     $item = Item::find(1);
-    $item->attach('/PATH/TO/YOUR/FILE1');
-    $item->attach('/PATH/TO/YOUR/FILE2');
-    $item->attach('/PATH/TO/YOUR/FILE3');
+    $item->attach('attachment_key_1', '/PATH/TO/YOUR/FILE1');
+    $item->attach('attachment_key_2', '/PATH/TO/YOUR/FILE2');
+    $item->attach('attachment_key_3', '/PATH/TO/YOUR/FILE3');
     $item->save();
+    
+    // or
+    
+    $item->attach([
+        'attachment_key_1' => '/PATH/TO/YOUR/FILE1',
+        'attachment_key_2' => '/PATH/TO/YOUR/FILE2',
+        'attachment_key_3' => '/PATH/TO/YOUR/FILE3'
+    ]);
 
 [Parameters]: You can add parameters to each attachments.
     
@@ -61,67 +69,68 @@ Now you can use new methods called `attach` and `detach` with your model.
         'key_3' => 'value_3'
     ];
     $item = Item::find(1);
-    $item->attach('/PATH/TO/YOUR/FILE', $parameters);
+    $item->attach('attachment_key', '/PATH/TO/YOUR/FILE', $parameters);
     $item->save();
 
 **Detachment**  
 
-[Attachment ID]:
-
-    $attachment_id = 1; // This is an ID of the table called `attachments`.
+[Basic way]:  
 
     $item = Item::find(1);
-    $item->detach($attachment_id);
+    $item->detach('key');
     $item->save();
 
-[File path]: You also can use file path to detach.
+[Multiple way]:  
 
     $item = Item::find(1);
-    $item->detach('/PATH/TO/YOUR/FILE');
+    $item->detach('key');
+    $item->detach('key2');
+    $item->detach('key3');
     $item->save();
-
-[Remove file]: You can remove file by setting `true` as the 2nd argument like so.
-
-    $item->detach(1, true);
-
-[In iterator]: 
-
-    $item = Item::find(1);
     
-    foreach ($item->attachments as $attachment) {
+    // or
     
-        $remove_file = true;
-        $attachment->delete($remove_file);
-    
-    }
+    $item->detach(['key', 'key2', 'key3']);
 
-**Retrieve attachment data**
+**Retrieve attachment data** 
 
 You can get attachment data through an attribute called `attachments`.
 
     $item = Item::find(1);
-
+    
     foreach ($item->attachments as $attachment) {
     
         echo $attachment->id;
         echo $attachment->model;
         echo $attachment->model_id;
-        echo $attachment->path;
+        echo $attachment->key;
+        echo $attachment->dir;
         echo $attachment->filename;
         echo $attachment->full_path;
         echo $attachment->extension;
         echo $attachment->mime_type;
         echo $attachment->size;
-        echo $attachment->parameters;
-        echo $attachment->created_at;
-        echo $attachment->updated_at;
-        echo $attachment->parameters;   // Here is array.
+        echo $attachment->parameters;   // Array
+        echo $attachment->created_at;   // DateTime
+        echo $attachment->updated_at;   // DateTime
     
     }
 
-# When attached/detached?
 
-When called save(), attachment or detachment will be executed.
+    // Array with key
+
+    $filenames = $item->attachment_filenames;
+    $paths = $item->attachment_paths;
+
+**Unneeded Files**
+
+If there are unneeded files after attaching, detaching or deleting, you can get file paths with key.
+
+    $unneeded_paths = $item->unneeded_file_paths;
+
+**Note**
+
+This package actually does NOT manipulate files like saving and removing. 
 
 # License
 

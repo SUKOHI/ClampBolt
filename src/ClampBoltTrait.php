@@ -7,180 +7,154 @@ trait ClampBoltTrait {
 
 	private $clamp_bolt_attachments,
 			$clamp_bolt_detachments,
-			$clamp_bolt_db_data,
-			$clamp_bolt_db_map = [];
-	private $clamp_bolt_init_flag = false;
+			$clamp_bolt_unneeded_paths = [];
 
-	public function attach($path, $parameters = []) {
+	public function attach($key, $path = '', $parameters = []) {
 
-		$this->loadDb();
-		$file = new File($path);
+		$keys = (!is_array($key)) ? [$key => $path] : $key;
 
-		if($file->isFile()) {
+		foreach ($keys as $key => $path) {
 
-			$key = $this->clampBoltAttachmentKey($path);
-			$this->clamp_bolt_attachments[$key] = [
-				'file' => $file,
-				'parameters' => $parameters
-			];
+			if(file_exists($path)) {
 
-			if(isset($this->clamp_bolt_detachments[$key])) {
+				$this->clamp_bolt_attachments[$key] = [
+					'path' => $path,
+					'parameters' => $parameters
+				];
 
-				unset($this->clamp_bolt_detachments[$key]);
+				if(isset($this->clamp_bolt_detachments[$key])) {
+
+					unset($this->clamp_bolt_detachments[$key]);
+
+				}
+
+			} else {
+
+				throw new \Exception('File does not exist.');
 
 			}
 
-			return $this;
-
 		}
 
-		throw new \Exception('File does not exist.');
+		return $this;
 
 	}
 
-	public function detach($id_or_path, $remove_file = false) {
+	public function detach($key) {
 
-		$this->loadDb();
-		$key = '';
+		$keys = (!is_array($key)) ? [$key] : $key;
 
-		if(is_int($id_or_path) && isset($this->clamp_bolt_db_map[$id_or_path])) {
+		foreach ($keys as $key) {
 
-			$key = $this->clamp_bolt_db_map[$id_or_path];
+			$this->clamp_bolt_detachments[$key] = true;
 
-		} else if(is_string($id_or_path)) {
+			if(isset($this->clamp_bolt_attachments[$key])) {
 
-			$key = $this->clampBoltAttachmentKey($id_or_path);
+				unset($this->clamp_bolt_attachments[$key]);
 
-		}
-
-		if(array_search($key, $this->clamp_bolt_db_map) !== false) {
-
-			$this->clamp_bolt_detachments[$key] = [
-				'remove_file' => (boolean)$remove_file
-			];
-			unset($this->clamp_bolt_attachments[$key]);
+			}
 
 		}
+
+		return $this;
 
 	}
 
 	public function saveAttachments() {
 
-		if($this->id <= 0) {
-
-			throw new \Exception('Model data do not exist.');
-
-		} else if(empty($this->clamp_bolt_attachments) && empty($this->clamp_bolt_detachments)) {
+		if(empty($this->clamp_bolt_attachments) && empty($this->clamp_bolt_detachments)) {
 
 			return true;
 
 		}
 
-		$model = $this->clampBoltClassName();
-		$attachments_with_key = [];
+		if($this->attachments->count() > 0) {
 
-		if($this->clamp_bolt_db_data->count() > 0) {
+			foreach ($this->attachments as $attachment) {
 
-			foreach ($this->clamp_bolt_db_data as $attachment) {
+				$key = $attachment->key;
 
-				$attachment_key = $this->clampBoltAttachmentKey($attachment->full_path);
-				$attachments_with_key[$attachment_key] = $attachment;
+				if(isset($this->clamp_bolt_attachments[$key])) {
 
-			}
+					$path = $this->clamp_bolt_attachments[$key]['path'];
+					$parameters = $this->clamp_bolt_attachments[$key]['parameters'];
 
-		}
+					if($attachment->full_path != $path) {
 
-		if(!empty($this->clamp_bolt_attachments)) {
+						$this->setUnneededPath($key, $attachment->full_path);
+						$file = new File($path);
+						$attachment->dir = $file->getPath();
+						$attachment->filename = $file->getFilename();
 
-			foreach ($this->clamp_bolt_attachments as $key => $clamp_bolt_attachment) {
+					}
 
-				$file = $clamp_bolt_attachment['file'];
-				$parameters = $clamp_bolt_attachment['parameters'];
+					$this->saveAttachment($attachment, $key, $path, $parameters);
+					unset($this->clamp_bolt_attachments[$key]);
 
-				$attachment = array_get($attachments_with_key, $key, $this->clampBoltAttachmentModel());
-				$attachment->model = $model;
-				$attachment->model_id = $this->id;
-				$attachment->path = $file->getPath();
-				$attachment->filename = $file->getFilename();
-				$attachment->extension = $file->getExtension();
-				$attachment->mime_type = $file->getMimeType();
-				$attachment->size = $file->getSize();
-				$attachment->parameters = $parameters;
-				$attachment->save();
+				}
 
-			}
+				if(isset($this->clamp_bolt_detachments[$key])) {
 
-		}
-		
-		if(!empty($this->clamp_bolt_detachments)) {
+					$path = $attachment->full_path;
 
-			foreach ($this->clamp_bolt_detachments as $key => $clamp_bolt_detachment) {
+					if($attachment->delete()) {
 
-				$detachment = $attachments_with_key[$key];
-				$remove_file = $clamp_bolt_detachment['remove_file'];
-				$detachment->delete($remove_file);
+						$this->setUnneededPath($key, $path);
+
+					}
+
+				}
 
 			}
 
 		}
 
-		$this->clamp_bolt_init_flag = false;
+		if(count($this->clamp_bolt_attachments) > 0) {
+
+			foreach ($this->clamp_bolt_attachments as $key => $attachment) {
+
+				$this->saveAttachment(null, $key, $attachment['path'], $attachment['parameters']);
+
+			}
+
+		}
+
+		$this->load('attachments');
 		return true;
 
 	}
 
-	private function loadDb() {
+	private function saveAttachment($attachment = null, $key, $path, $parameters) {
 
-		if(!$this->clamp_bolt_init_flag) {
+		if(is_null($attachment)) {
 
-			$this->init();
-
-		}
-
-	}
-
-	private function init() {
-
-		$this->clamp_bolt_db_map = [];
-		$model = $this->clampBoltClassName();
-		$attachments = $this->clampBoltAttachmentModel()
-			->where('model', $model)
-			->where('model_id', $this->id)
-			->get();
-
-		if($attachments->count() > 0) {
-
-			foreach ($attachments as $attachment) {
-
-				$id = $attachment->id;
-				$key = $this->clampBoltAttachmentKey($attachment->full_path);
-				$this->clamp_bolt_db_map[$id] = $key;
-
-			}
+			$attachment = new Attachment;
 
 		}
 
-		$this->clamp_bolt_db_data = $attachments;
-		$this->clamp_bolt_init_flag = true;
+		$file = new File($path);
+		$attachment->model = $this->getCurrentClassName();
+		$attachment->model_id = $this->id;
+		$attachment->key = $key;
+		$attachment->dir = $file->getPath();
+		$attachment->filename = $file->getFilename();
+		$attachment->extension = $file->getExtension();
+		$attachment->mime_type = $file->getMimeType();
+		$attachment->size = $file->getSize();
+		$attachment->parameters = $parameters;
+		return $attachment->save();
 
 	}
 
-	private function clampBoltClassName() {
+	private function getCurrentClassName() {
 
 		return __CLASS__;
 
 	}
 
-	private function clampBoltAttachmentModel() {
+	private function setUnneededPath($key, $path) {
 
-		return new Attachment;
-
-	}
-
-	private function clampBoltAttachmentKey($path) {
-
-		$model = $this->clampBoltClassName();
-		return md5($model .'_'. $path);
+		$this->clamp_bolt_unneeded_paths[$key] = $path;
 
 	}
 
@@ -200,11 +174,79 @@ trait ClampBoltTrait {
 
 	}
 
+	public function delete() {
+
+		\DB::beginTransaction();
+
+		try {
+
+			parent::delete();
+			$model = $this->getCurrentClassName();
+			$model_id = $this->id;
+			\DB::table('attachments')->where('model', $model)
+				->where('model_id', $model_id)
+				->delete();
+			\DB::commit();
+
+			if($this->attachments->count() > 0) {
+
+				foreach ($this->attachments as $attachment) {
+
+					$key = $attachment->key;
+					$path = $attachment->full_path;
+					$this->setUnneededPath($key, $path);
+
+				}
+
+			}
+
+			return true;
+
+		} catch (\Exception $e) {
+
+			\DB::rollBack();
+
+		}
+
+		return false;
+
+	}
+
 	// Relationship
 
 	public function attachments() {
 
 		return $this->hasMany('Sukohi\ClampBolt\App\Attachment', 'model_id', 'id');
+
+	}
+
+	// Accessors
+
+	public function getAttachmentFilenamesAttribute() {
+
+		return $this->attachments->lists('filename', 'id')->all();
+
+	}
+
+	public function getAttachmentPathsAttribute() {
+
+		$paths = [];
+
+		foreach ($this->attachments as $index => $attachment) {
+
+			$id = $attachment->id;
+			$path = $attachment->full_path;
+			$paths[$id] = $path;
+
+		}
+
+		return $paths;
+
+	}
+
+	public function getUnneededFilePathsAttribute() {
+
+		return $this->clamp_bolt_unneeded_paths;
 
 	}
 

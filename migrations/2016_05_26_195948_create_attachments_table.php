@@ -17,13 +17,19 @@ class CreateAttachmentsTable extends Migration
 			$table->increments('id');
 			$table->string('model');
 			$table->string('model_id');
-			$table->string('path');
+			$table->string('key');
+			$table->string('dir');
 			$table->string('filename');
 			$table->string('extension');
 			$table->string('mime_type');
 			$table->integer('size');
 			$table->text('parameters');
 			$table->timestamps();
+			$table->unique([
+				'model',
+				'model_id',
+				'key'
+			]);
 		});
 	}
 
