@@ -26,10 +26,9 @@ And you need to set `ClampBoltTrait` into your model like so.
 
     use Sukohi\ClampBolt\ClampBoltTrait;
     
-    class Item extends Eloquent {
-    
+    class Item extends Model
+    {
         use ClampBoltTrait;
-        
     }
     
 That's all.  
@@ -41,13 +40,13 @@ Now you can use new methods called `attach` and `detach` with your model.
     
 [Basic way]:  
     
-    $item = Item::find(1);
+    $item = \App\Item::find(1);
     $item->attach('attachment_key', '/PATH/TO/YOUR/FILE');
     $item->save();
 
 [Multiple way]:  
 
-    $item = Item::find(1);
+    $item = \App\Item::find(1);
     $item->attach('attachment_key_1', '/PATH/TO/YOUR/FILE1');
     $item->attach('attachment_key_2', '/PATH/TO/YOUR/FILE2');
     $item->attach('attachment_key_3', '/PATH/TO/YOUR/FILE3');
@@ -68,7 +67,7 @@ Now you can use new methods called `attach` and `detach` with your model.
         'key_2' => 'value_2', 
         'key_3' => 'value_3'
     ];
-    $item = Item::find(1);
+    $item = \App\Item::find(1);
     $item->attach('attachment_key', '/PATH/TO/YOUR/FILE', $parameters);
     $item->save();
 
@@ -76,13 +75,13 @@ Now you can use new methods called `attach` and `detach` with your model.
 
 [Basic way]:  
 
-    $item = Item::find(1);
+    $item = \App\Item::find(1);
     $item->detach('key');
     $item->save();
 
 [Multiple way]:  
 
-    $item = Item::find(1);
+    $item = \App\Item::find(1);
     $item->detach('key');
     $item->detach('key2');
     $item->detach('key3');
@@ -96,7 +95,7 @@ Now you can use new methods called `attach` and `detach` with your model.
 
 You can get attachment data through an attribute called `attachments`.
 
-    $item = Item::find(1);
+    $item = \App\Item::find(1);
     
     foreach ($item->attachments as $attachment) {
     
