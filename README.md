@@ -120,6 +120,18 @@ You can get attachment data through an attribute called `attachments`.
 
     $filenames = $item->attachment_filenames;
     $paths = $item->attachment_paths;
+    
+    
+    // Filter by key
+    
+    $attachment_key = 'YOUR-KEY';
+    
+    if($item->hasAttachment($attachment_key)) {
+
+        $attachment = $item->getAttachment($attachment_key);
+        echo $attachment->key;  // YOUR-KEY
+
+    }
 
 * If you use "dot-notion" like `array_key.0` for attachment key, `attachment_filenames` and `attachment_paths` attributes return multi-dimensional array.
 

@@ -251,6 +251,8 @@ trait ClampBoltTrait {
 
 	}
 
+	// Others
+
 	private function convertMultiDimensionalArray(array $values) {
 
 		$array = [];
@@ -284,5 +286,29 @@ trait ClampBoltTrait {
 		return $array;
 
 	}
+
+	public function hasAttachment($key) {
+
+        return $this->attachments->contains('key', $key);
+
+    }
+
+	public function getAttachment($key) {
+
+        $attachment = $this->attachments->first(function($attachment_key, $attachment) use($key){
+
+            return $attachment->key == $key;
+
+        });
+
+        if(is_null($attachment)) {
+
+            return new Attachment;
+
+        }
+
+        return $attachment;
+
+    }
 
 }
