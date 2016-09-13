@@ -90,6 +90,13 @@ Now you can use new methods called `attach` and `detach` with your model.
     // or
     
     $item->detach(['key', 'key2', 'key3']);
+    $item->save();
+    
+[All]:
+
+    $item = \App\Item::find(1);
+    $item->detachAll();
+    $item->save();
 
 **Retrieve attachment data** 
 

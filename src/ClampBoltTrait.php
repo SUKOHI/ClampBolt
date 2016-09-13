@@ -60,6 +60,18 @@ trait ClampBoltTrait {
 
 	}
 
+	public function detachAll() {
+
+        foreach ($this->attachments as $attachment) {
+
+            $this->detach($attachment->key);
+
+        }
+
+		return $this;
+
+	}
+
 	public function saveAttachments() {
 
 		if(empty($this->clamp_bolt_attachments) && empty($this->clamp_bolt_detachments)) {
