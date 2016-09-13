@@ -259,9 +259,15 @@ trait ClampBoltTrait {
 
 	public function getUnneededFilePathsAttribute() {
 
-		return $this->convertMultiDimensionalArray($this->clamp_bolt_unneeded_paths);
+		return $this->clamp_bolt_unneeded_paths;
 
 	}
+
+	public function getUnneededMultiDimensionalFilePathsAttribute() {
+
+        return $this->convertMultiDimensionalArray($this->clamp_bolt_unneeded_paths);
+
+    }
 
 	// Others
 

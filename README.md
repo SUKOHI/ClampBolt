@@ -147,6 +147,10 @@ You can get attachment data through an attribute called `attachments`.
 If there are unneeded files after attaching, detaching or deleting, you can get file paths with key.
 
     $unneeded_paths = $item->unneeded_file_paths;
+    
+    or 
+    
+    $unneeded_multi_dimensional_paths = $item->unneeded_multi_dimensional_file_paths;
 
 **Note**
 
