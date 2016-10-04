@@ -152,6 +152,12 @@ If there are unneeded files after attaching, detaching or deleting, you can get 
     
     $unneeded_multi_dimensional_paths = $item->unneeded_multi_dimensional_file_paths;
 
+**File Stream**
+
+You can return `response` for streaming like so.
+
+    return $item->getAttachment($key)->stream();    
+
 **Note**
 
 This package actually does NOT manipulate files like saving and removing. 
