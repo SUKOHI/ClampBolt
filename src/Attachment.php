@@ -23,7 +23,7 @@ class Attachment extends Model
 
     }
 
-    public function stream($offset = 4096) {
+    public function stream($length = 8192) {
 
         $path = $this->getFullPathAttribute();
         $full_size = $size = filesize($path);
@@ -57,7 +57,7 @@ class Attachment extends Model
 
         $headers['Content-Length'] = $size;
 
-        return response()->stream(function () use ($file, $offset) {
+        return response()->stream(function () use ($file, $length) {
 
             if ($file === false) {
 
@@ -67,7 +67,7 @@ class Attachment extends Model
 
             while(!feof($file)) {
 
-                $buffer = fgets($file, $offset);
+                $buffer = fread($file, $length);
                 echo $buffer;
                 ob_flush();
                 flush();
