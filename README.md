@@ -160,8 +160,8 @@ You can return `response` for streaming like so.
 
     // or
     
-    $offset = 1024;
-    return $item->getAttachment($key)->stream($offset);  
+    $buffer = 1024;
+    return $item->getAttachment($key)->stream($buffer);  
 
 **Note**
 
