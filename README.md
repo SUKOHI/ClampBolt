@@ -156,7 +156,12 @@ If there are unneeded files after attaching, detaching or deleting, you can get 
 
 You can return `response` for streaming like so.
 
-    return $item->getAttachment($key)->stream();    
+    return $item->getAttachment($key)->stream();  
+
+    // or
+    
+    $offset = 1024;
+    return $item->getAttachment($key)->stream($offset);  
 
 **Note**
 
