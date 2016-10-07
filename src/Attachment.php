@@ -6,26 +6,26 @@ use Illuminate\Database\Eloquent\Model;
 
 class Attachment extends Model
 {
-	/**
-	 * The attributes that should be casted to native types.
-	 *
-	 * @var array
-	 */
-	protected $casts = [
-		'parameters' => 'array',
-	];
+    /**
+     * The attributes that should be casted to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'parameters' => 'array',
+    ];
 
-	// Accessor
+    // Accessor
 
-	public function getFullPathAttribute() {
+    public function getFullPathAttribute() {
 
-		return $this->dir .'/'. $this->filename;
+        return $this->dir .'/'. $this->filename;
 
-	}
+    }
 
-	public function stream() {
+    public function stream() {
 
-	    $path = $this->getFullPathAttribute();
+        $path = $this->getFullPathAttribute();
         $full_size = $size = filesize($path);
         $file = fopen($path, 'r');
         $http_code = 200;
@@ -59,7 +59,20 @@ class Attachment extends Model
 
         return response()->stream(function () use ($file) {
 
-            fpassthru($file);
+            if ($file === false) {
+                return false;
+            }
+
+            while(!feof($file)) {
+
+                $buffer = fgets($file, 1024*1024);
+                echo $buffer;
+                ob_flush();
+                flush();
+
+            }
+
+            exit;
 
         }, $http_code, $headers);
 
