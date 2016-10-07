@@ -23,60 +23,80 @@ class Attachment extends Model
 
     }
 
-    public function stream($length = 8192) {
+    public function stream($buffer = 1024) {
 
-        $path = $this->getFullPathAttribute();
-        $full_size = $size = filesize($path);
-        $file = fopen($path, 'r');
-        $http_code = 200;
-        $headers = [
-            'Accept-Ranges' => 'bytes',
-            'Content-type' => $this->mime_type
-        ];
+        $file = $this->getFullPathAttribute();
+        $fp = @fopen($file, 'rb');
+        $size   = filesize($file);
+        $length = $size;
+        $start  = 0;
+        $end = $size - 1;
+        header('Content-type: '. $this->mime_type);
+        header('Accept-Ranges: bytes');
 
-        $range = \Request::header('Range');
+        if(isset($_SERVER['HTTP_RANGE'])) {
 
-        if(preg_match('!(bytes)=([0-9]+)-([0-9]+)!', $range, $matches)) {
+            $c_start = $start;
+            $c_end   = $end;
+            list(, $range) = explode('=', $_SERVER['HTTP_RANGE'], 2);
 
-            $range_unit = $matches[1];
-            $start_range = $matches[2];
-            $end_range = $matches[3];
-            $start = intval(substr($range, $start_range+1, $end_range));
-            $success = fseek($file, $start);
+            if(strpos($range, ',') !== false) {
 
-            if($success == 0) {
-
-                $size = $full_size - $start;
-                $http_code = 206;
-                $headers['Accept-Ranges'] = $range_unit;
-                $headers['Content-Range'] = $range_unit . ' ' . $start . '-' . ($full_size-1) . '/' . $full_size;
+                header('HTTP/1.1 416 Requested Range Not Satisfiable');
+                header("Content-Range: bytes $start-$end/$size");
+                exit;
 
             }
+
+            if($range == '-') {
+
+                $c_start = $size - substr($range, 1);
+
+            } else{
+
+                $range  = explode('-', $range);
+                $c_start = $range[0];
+                $c_end   = (isset($range[1]) && is_numeric($range[1])) ? $range[1] : $size;
+
+            }
+
+            $c_end = ($c_end > $end) ? $end : $c_end;
+
+            if($c_start > $c_end || $c_start > $size - 1 || $c_end >= $size) {
+
+                header('HTTP/1.1 416 Requested Range Not Satisfiable');
+                header("Content-Range: bytes $start-$end/$size");
+                exit;
+
+            }
+
+            $start  = $c_start;
+            $end    = $c_end;
+            $length = $end - $start + 1;
+            fseek($fp, $start);
+            header('HTTP/1.1 206 Partial Content');
 
         }
 
-        $headers['Content-Length'] = $size;
+        header("Content-Range: bytes $start-$end/$size");
+        header("Content-Length: ".$length);
 
-        return response()->stream(function () use ($file, $length) {
+        while(!feof($fp) && ($p = ftell($fp)) <= $end) {
 
-            if ($file === false) {
+            if($p + $buffer > $end) {
 
-                return false;
-
-            }
-
-            while(!feof($file)) {
-
-                $buffer = fread($file, $length);
-                echo $buffer;
-                ob_flush();
-                flush();
+                $buffer = $end - $p + 1;
 
             }
 
-            exit;
+            set_time_limit(0);
+            echo fread($fp, $buffer);
+            flush();
 
-        }, $http_code, $headers);
+        }
+
+        fclose($fp);
+        exit();
 
     }
 }
