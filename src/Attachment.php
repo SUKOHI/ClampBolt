@@ -19,84 +19,41 @@ class Attachment extends Model
 
     public function getFullPathAttribute() {
 
-        return $this->dir .'/'. $this->filename;
+        if(!empty($this->dir) && !empty($this->filename)) {
+
+            return $this->dir .'/'. $this->filename;
+
+        }
+
+        return '';
 
     }
 
-    public function stream($buffer = 1024) {
+    public function response() {
 
-        $file = $this->getFullPathAttribute();
-        $fp = @fopen($file, 'rb');
-        $size   = filesize($file);
-        $length = $size;
-        $start  = 0;
-        $end = $size - 1;
-        header('Content-type: '. $this->mime_type);
-        header('Accept-Ranges: bytes');
+        $full_path = $this->full_path;
 
-        if(isset($_SERVER['HTTP_RANGE'])) {
+        if(!file_exists($full_path)) {
 
-            $c_start = $start;
-            $c_end   = $end;
-            list(, $range) = explode('=', $_SERVER['HTTP_RANGE'], 2);
-
-            if(strpos($range, ',') !== false) {
-
-                header('HTTP/1.1 416 Requested Range Not Satisfiable');
-                header("Content-Range: bytes $start-$end/$size");
-                exit;
-
-            }
-
-            if($range == '-') {
-
-                $c_start = $size - substr($range, 1);
-
-            } else{
-
-                $range  = explode('-', $range);
-                $c_start = $range[0];
-                $c_end   = (isset($range[1]) && is_numeric($range[1])) ? $range[1] : $size;
-
-            }
-
-            $c_end = ($c_end > $end) ? $end : $c_end;
-
-            if($c_start > $c_end || $c_start > $size - 1 || $c_end >= $size) {
-
-                header('HTTP/1.1 416 Requested Range Not Satisfiable');
-                header("Content-Range: bytes $start-$end/$size");
-                exit;
-
-            }
-
-            $start  = $c_start;
-            $end    = $c_end;
-            $length = $end - $start + 1;
-            fseek($fp, $start);
-            header('HTTP/1.1 206 Partial Content');
+            throw new Exception('File not exists.');
 
         }
 
-        header("Content-Range: bytes $start-$end/$size");
-        header("Content-Length: ".$length);
+        return response()->file($full_path);
 
-        while(!feof($fp) && ($p = ftell($fp)) <= $end) {
+    }
 
-            if($p + $buffer > $end) {
+    public function download($name = '') {
 
-                $buffer = $end - $p + 1;
+        $full_path = $this->full_path;
 
-            }
+        if(!file_exists($full_path)) {
 
-            set_time_limit(0);
-            echo fread($fp, $buffer);
-            flush();
+            throw new Exception('File not exists.');
 
         }
 
-        fclose($fp);
-        exit();
+        return response()->download($full_path, $name);
 
     }
 }

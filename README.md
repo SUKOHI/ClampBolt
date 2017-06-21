@@ -1,12 +1,12 @@
 # ClampBolt
 A Laravel package to attach/detach files to/from model.  
-(This is for Laravel 5+. [For Laravel 4.2](https://github.com/SUKOHI/ClampBolt/tree/1.0))
+(This maintained in L5.4)
 
 # Installation
 
 Execute composer command.
 
-    composer require sukohi/clamp-bolt:3.*
+    composer require sukohi/clamp-bolt:4.*
 
 Register the service provider in app.php
 
@@ -98,74 +98,85 @@ Now you can use new methods called `attach` and `detach` with your model.
     $item->detachAll();
     $item->save();
 
-**Retrieve attachment data** 
+[with Deleting file(s)]
 
-You can get attachment data through an attribute called `attachments`.
+    $item->detach('key', true);
+    $item->save();
+    
+    // or
+    
+    $item->detach(['key', 'key2', 'key3'], true);
+    $item->save();
+    
+    // or 
+    
+    $item->detachAll(true);
+    $item->save();
+    
+
+**Retrieve attachment** 
+
+    $item = \App\Item::find(1);
+    $attachment = $item->getAttachment($key);
+    
+    echo $attachment->id;
+    echo $attachment->model;
+    echo $attachment->model_id;
+    echo $attachment->key;
+    echo $attachment->dir;
+    echo $attachment->filename;
+    echo $attachment->full_path;
+    echo $attachment->extension;
+    echo $attachment->mime_type;
+    echo $attachment->size;
+    echo $attachment->parameters;   // Array
+    echo $attachment->created_at;   // DateTime
+    echo $attachment->updated_at;   // DateTime
+
+
+You also can get all attachments at once like so.
 
     $item = \App\Item::find(1);
     
-    foreach ($item->attachments as $attachment) {
+    foreach ($item->attachments as $key => $attachment) {
     
-        echo $attachment->id;
-        echo $attachment->model;
-        echo $attachment->model_id;
-        echo $attachment->key;
-        echo $attachment->dir;
-        echo $attachment->filename;
-        echo $attachment->full_path;
-        echo $attachment->extension;
-        echo $attachment->mime_type;
-        echo $attachment->size;
-        echo $attachment->parameters;   // Array
-        echo $attachment->created_at;   // DateTime
-        echo $attachment->updated_at;   // DateTime
+        // Do something..
     
     }
 
+or 
 
-    // Array with key
-
+    // Filenames
     $filenames = $item->attachment_filenames;
+    
+    // Paths
     $paths = $item->attachment_paths;
     
-    
-    // Filter by key
-    
-    $attachment_key = 'YOUR-KEY';
-    
-    if($item->hasAttachment($attachment_key)) {
+* If you use "dot-notation" like `array_key.0` for attachment key, `attachment_filenames` and `attachment_paths` attributes return multi-dimensional array.
 
-        $attachment = $item->getAttachment($attachment_key);
-        echo $attachment->key;  // YOUR-KEY
+**Check if attachment exists**
+    
+    $key = 'YOUR-KEY';
+    
+    if($item->hasAttachment($key)) {
+
+        $attachment = $item->getAttachment($key);
 
     }
 
-* If you use "dot-notion" like `array_key.0` for attachment key, `attachment_filenames` and `attachment_paths` attributes return multi-dimensional array.
 
-**Unneeded Files**
+**Download**
 
-If there are unneeded files after attaching, detaching or deleting, you can get file paths with key.
 
-    $unneeded_paths = $item->unneeded_file_paths;
-    
-    or 
-    
-    $unneeded_multi_dimensional_paths = $item->unneeded_multi_dimensional_file_paths;
-
-**File Stream**
-
-You can return `response` for streaming like so.
-
-    return $item->getAttachment($key)->stream();  
+    return $item->getAttachment($key)->download();  
 
     // or
     
-    $buffer = 1024;
-    return $item->getAttachment($key)->stream($buffer);  
+    return $item->getAttachment($key)->download('filename.jpg');  
 
-**Note**
+**Response**
 
-This package actually does NOT manipulate files like saving and removing. 
+    return $item->getAttachment($key)->response();  
 
 # License
 

@@ -7,7 +7,7 @@ trait ClampBoltTrait {
 
 	private $clamp_bolt_attachments,
 			$clamp_bolt_detachments,
-			$clamp_bolt_unneeded_paths = [];
+			$clamp_bolt_deletions = [];
 
 	public function attach($key, $path = '', $parameters = []) {
 
@@ -40,13 +40,14 @@ trait ClampBoltTrait {
 
 	}
 
-	public function detach($key) {
+	public function detach($key, $deleting_flag = false) {
 
 		$keys = (!is_array($key)) ? [$key] : $key;
 
 		foreach ($keys as $key) {
 
 			$this->clamp_bolt_detachments[$key] = true;
+			$this->clamp_bolt_deletions[$key] = $deleting_flag;
 
 			if(isset($this->clamp_bolt_attachments[$key])) {
 
@@ -60,11 +61,11 @@ trait ClampBoltTrait {
 
 	}
 
-	public function detachAll() {
+	public function detachAll($deleting_flag = false) {
 
         foreach ($this->attachments as $attachment) {
 
-            $this->detach($attachment->key);
+            $this->detach($attachment->key, $deleting_flag);
 
         }
 
@@ -93,7 +94,6 @@ trait ClampBoltTrait {
 
 					if($attachment->full_path != $path) {
 
-						$this->setUnneededPath($key, $attachment->full_path);
 						$file = new File($path);
 						$attachment->dir = $file->getPath();
 						$attachment->filename = $file->getFilename();
@@ -111,7 +111,11 @@ trait ClampBoltTrait {
 
 					if($attachment->delete()) {
 
-						$this->setUnneededPath($key, $path);
+						if(isset($this->clamp_bolt_deletions[$key]) && $this->clamp_bolt_deletions[$key]) {
+
+                            @unlink($path);
+
+                        }
 
 					}
 
@@ -164,12 +168,6 @@ trait ClampBoltTrait {
 
 	}
 
-	private function setUnneededPath($key, $path) {
-
-		$this->clamp_bolt_unneeded_paths[$key] = $path;
-
-	}
-
 	// Override
 
 	public function save(array $options = []) {
@@ -202,13 +200,7 @@ trait ClampBoltTrait {
 
 			if($this->attachments->count() > 0) {
 
-				foreach ($this->attachments as $attachment) {
-
-					$key = $attachment->key;
-					$path = $attachment->full_path;
-					$this->setUnneededPath($key, $path);
-
-				}
+				$this->detachAll();
 
 			}
 
@@ -257,18 +249,6 @@ trait ClampBoltTrait {
 
 	}
 
-	public function getUnneededFilePathsAttribute() {
-
-		return $this->clamp_bolt_unneeded_paths;
-
-	}
-
-	public function getUnneededMultiDimensionalFilePathsAttribute() {
-
-        return $this->convertMultiDimensionalArray($this->clamp_bolt_unneeded_paths);
-
-    }
-
 	// Others
 
 	private function convertMultiDimensionalArray(array $values) {
@@ -311,21 +291,17 @@ trait ClampBoltTrait {
 
     }
 
-	public function getAttachment($key) {
+    public function getAttachment($key) {
 
-        $attachment = $this->attachments->first(function($attachment_key, $attachment) use($key){
+        $attachments_keys = $this->attachments->keyBy('key');
 
-            return $attachment->key == $key;
-
-        });
-
-        if(is_null($attachment)) {
+        if(!$attachments_keys->has($key)) {
 
             return new Attachment;
 
         }
 
-        return $attachment;
+        return $attachments_keys->get($key);
 
     }
 
