@@ -71,6 +71,10 @@ Now you can use new methods called `attach` and `detach` with your model.
     $item->attach('attachment_key', '/PATH/TO/YOUR/FILE', $parameters);
     $item->save();
 
+[Deleting old file]: If you'd like to delete old file, set `true` in the 4th argument.
+
+    $item->attach('attachment_key', '/PATH/TO/YOUR/NEW/FILE', [], true);
+
 **Detachment**  
 
 [Basic way]:  

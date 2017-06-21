@@ -9,7 +9,7 @@ trait ClampBoltTrait {
 			$clamp_bolt_detachments,
 			$clamp_bolt_deletions = [];
 
-	public function attach($key, $path = '', $parameters = []) {
+	public function attach($key, $path = '', $parameters = [], $deleting_flag = false) {
 
 		$keys = (!is_array($key)) ? [$key => $path] : $key;
 
@@ -21,6 +21,7 @@ trait ClampBoltTrait {
 					'path' => $path,
 					'parameters' => $parameters
 				];
+                $this->clamp_bolt_deletions[$key] = $deleting_flag;
 
 				if(isset($this->clamp_bolt_detachments[$key])) {
 
@@ -93,6 +94,12 @@ trait ClampBoltTrait {
 					$parameters = $this->clamp_bolt_attachments[$key]['parameters'];
 
 					if($attachment->full_path != $path) {
+echo '<pre>'. print_r($this->clamp_bolt_deletions, true) .'</pre>';
+                        if(isset($this->clamp_bolt_deletions[$key]) && $this->clamp_bolt_deletions[$key]) {
+
+                            @unlink($attachment->full_path);
+
+                        }
 
 						$file = new File($path);
 						$attachment->dir = $file->getPath();
