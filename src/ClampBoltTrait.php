@@ -94,7 +94,7 @@ trait ClampBoltTrait {
 					$parameters = $this->clamp_bolt_attachments[$key]['parameters'];
 
 					if($attachment->full_path != $path) {
-echo '<pre>'. print_r($this->clamp_bolt_deletions, true) .'</pre>';
+
                         if(isset($this->clamp_bolt_deletions[$key]) && $this->clamp_bolt_deletions[$key]) {
 
                             @unlink($attachment->full_path);
