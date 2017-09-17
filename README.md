@@ -71,6 +71,32 @@ Now you can use new methods called `attach` and `detach` with your model.
     $item->attach('attachment_key', '/PATH/TO/YOUR/FILE', $parameters);
     $item->save();
 
+[Auto-Saving]
+
+If you directly set `Request` parameter like the below, ClampBolt will automatically save the file in `storage` folder.
+
+    public function upload(Request $request, Item $item) {
+
+        $item->attach('attachment_key', $request->photo);
+        $item->save();
+
+    }
+    
+[Note:] The file path is `/storage/app/attachment_key/` in this case.
+
+And if you use dot notation like so, all of the files will be saved in `photos`.  
+I mean in the same folder.
+    
+    public function upload(Request $request, Item $item) {
+
+        $item->attach('photos.1', $request->photo_1);
+        $item->attach('photos.2', $request->photo_2);
+        $item->attach('photos.3', $request->photo_3);
+        $item->save();
+
+    }
+
+
 [Deleting old file]: If you'd like to delete old file, set `true` in the 4th argument.
 
     $item->attach('attachment_key', '/PATH/TO/YOUR/NEW/FILE', [], true);

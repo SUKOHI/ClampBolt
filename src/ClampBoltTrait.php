@@ -13,7 +13,9 @@ trait ClampBoltTrait {
 
 		$keys = (!is_array($key)) ? [$key => $path] : $key;
 
-		foreach ($keys as $key => $path) {
+		foreach ($keys as $key => $file_path) {
+
+            $path = $this->getAttachmentFilePath($key, $file_path);
 
 			if(file_exists($path)) {
 
@@ -168,6 +170,28 @@ trait ClampBoltTrait {
 		return $attachment->save();
 
 	}
+
+	private function getAttachmentFilePath($key, $file_path) {
+
+	    $path = '';
+
+        if($file_path instanceof \Illuminate\Http\UploadedFile) {
+
+            $keys = explode('.', $key);
+            $first_key = $keys[0];
+            $filename = date('Ymd_His_') . str_random() .'.'. $file_path->extension();
+            $file_path->storeAs($first_key, $filename);
+            $path = storage_path('app/'. $first_key .'/'. $filename);
+
+        } else if(is_string($file_path)) {
+
+            $path = $file_path;
+
+        }
+
+        return $path;
+
+    }
 
 	private function getCurrentClassName() {
 
