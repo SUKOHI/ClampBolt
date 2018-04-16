@@ -16,5 +16,12 @@
             "Sukohi\\ClampBolt\\": "src/"
         }
     },
-    "minimum-stability": "stable"
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Sukohi\\ClampBolt\\ClampBoltServiceProvider"
+            ]
+        }
+    }
 }
