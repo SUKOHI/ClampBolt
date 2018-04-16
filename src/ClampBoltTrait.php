@@ -5,8 +5,8 @@ use Symfony\Component\HttpFoundation\File\File;
 
 trait ClampBoltTrait {
 
-	private $clamp_bolt_attachments,
-			$clamp_bolt_detachments,
+	private $clamp_bolt_attachments = [],
+			$clamp_bolt_detachments = [],
 			$clamp_bolt_deletions = [];
 
 	public function attach($key, $path = '', $parameters = [], $deleting_flag = false) {
@@ -120,6 +120,8 @@ trait ClampBoltTrait {
 
 					if($attachment->delete()) {
 
+                        $this->fireAttachmentEvent('detached', $attachment);
+
 						if(isset($this->clamp_bolt_deletions[$key]) && $this->clamp_bolt_deletions[$key]) {
 
                             @unlink($path);
@@ -167,7 +169,15 @@ trait ClampBoltTrait {
 		$attachment->mime_type = $file->getMimeType();
 		$attachment->size = $file->getSize();
 		$attachment->parameters = $parameters;
-		return $attachment->save();
+		$result = $attachment->save();
+
+		if($result) {
+
+            $this->fireAttachmentEvent('attached', $attachment);
+
+        }
+
+		return $result;
 
 	}
 
@@ -191,6 +201,19 @@ trait ClampBoltTrait {
 
         return $path;
 
+    }
+
+    private function fireAttachmentEvent($event, $attachment) {
+
+        if (!in_array($event, ['attached', 'detached']) || ! isset($this->dispatchesEvents[$event])) {
+            return;
+        }
+
+        $result = static::$dispatcher->fire(new $this->dispatchesEvents[$event]($attachment));
+
+        if (! is_null($result)) {
+            return $result;
+        }
     }
 
 	private function getCurrentClassName() {
