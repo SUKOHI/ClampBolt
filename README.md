@@ -1,6 +1,6 @@
 # ClampBolt
 A Laravel package to attach/detach files to/from model.  
-(This maintained in L5.4)
+(This maintained in L5.6)
 
 # Installation
 
@@ -8,7 +8,7 @@ Execute composer command.
 
     composer require sukohi/clamp-bolt:4.*
 
-Register the service provider in app.php
+Register the service provider in app.php if your Laravel version is less than 5.4.
 
     'providers' => [
         ...Others...,  
@@ -17,12 +17,12 @@ Register the service provider in app.php
 
 # Preparation
 
-First of all, execute `migrate` command from the package.
+First of all, execute `publish` and `migrate` command.
 
-    php artisan vendor:publish
+    php artisan vendor:publish --provider="Sukohi\ClampBolt\ClampBoltServiceProvider"
     php artisan migrate
 
-And you need to set `ClampBoltTrait` into your model like so.
+And set `ClampBoltTrait` into your model like so.
 
     use Sukohi\ClampBolt\ClampBoltTrait;
     
@@ -32,7 +32,7 @@ And you need to set `ClampBoltTrait` into your model like so.
     }
     
 That's all.  
-Now you can use new methods called `attach` and `detach` with your model.
+Now you can use new methods called `attach()` and `detach()`.
 
 # Usage
 
@@ -207,6 +207,28 @@ or
 **Response**
 
     return $item->getAttachment($key)->response();  
+
+# Events
+
+You can call `attached` and `detached` events.
+
+    class Item extends Model
+    {
+        protected $dispatchesEvents = [
+            'attached' => ItemAttached::class,
+            'detached' => ItemDetached::class
+        ];
+
+(in Your event)
+
+    class ItemAttached
+    {
+        public function __construct(Attachment $attachment)
+        {
+            // Do someting..
+        }
+
+Note: the first argument of constructor is `$attachment` instance. Not parent model instance.
 
 # License
 
