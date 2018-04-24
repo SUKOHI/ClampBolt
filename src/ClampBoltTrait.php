@@ -51,7 +51,33 @@ trait ClampBoltTrait {
 
 	public function detach($key, $deleting_flag = false) {
 
-		$keys = (!is_array($key)) ? [$key] : $key;
+	    if($this->isWildcardKey($key)) {
+
+            $keys = [];
+            $first_part_key = $this->getWildcardFirstPartKey($key);
+            $model = $this->getCurrentClassName();
+            $model_id = $this->id;
+            $attachments = Attachment::where('model', $model)
+                ->where('model_id', $model_id)
+                ->where('key', 'LIKE', $first_part_key .'.%')
+                ->orderBy('id', 'asc')
+                ->get();
+
+            foreach ($attachments as $attachment) {
+
+                if($this->matchWildcardKeys($key, $attachment->key)) {
+
+                    $keys[] = $attachment->key;
+
+                }
+
+            }
+
+        } else {
+
+            $keys = (!is_array($key)) ? [$key] : $key;
+
+        }
 
 		foreach ($keys as $key) {
 
@@ -253,7 +279,7 @@ trait ClampBoltTrait {
 			parent::delete();
 			$model = $this->getCurrentClassName();
 			$model_id = $this->id;
-			\DB::table('attachments')->where('model', $model)
+            Attachment::where('model', $model)
 				->where('model_id', $model_id)
 				->delete();
 			\DB::commit();
@@ -394,6 +420,16 @@ trait ClampBoltTrait {
     private function isWildcardKey($key) {
 
 	    return ends_with($key, '.*');
+
+    }
+
+    private function matchWildcardKeys($key_1, $key_2) {
+
+        $keys_1 = explode('.', $key_1);
+        $keys_2 = explode('.', $key_2);
+        $first_key_1 = $this->getWildcardFirstPartKey($key_1);
+        $first_key_2 = $this->getWildcardFirstPartKey($key_2);
+        return (count($keys_1) == count($keys_2) && $first_key_1 == $first_key_2);
 
     }
 
