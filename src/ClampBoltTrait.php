@@ -15,6 +15,12 @@ trait ClampBoltTrait {
 
 		foreach ($keys as $key => $file_path) {
 
+		    if($this->isWildcardKey($key)) {
+
+                $key = $this->getWildcardKey($key);
+
+            }
+
             $path = $this->getAttachmentFilePath($key, $file_path);
 
 			if(file_exists($path)) {
@@ -347,15 +353,62 @@ trait ClampBoltTrait {
 
     public function getAttachment($key) {
 
-        $attachments_keys = $this->attachments->keyBy('key');
+        if($this->isWildcardKey($key)) {
 
-        if(!$attachments_keys->has($key)) {
-
-            return new Attachment;
+            return $this->getWildcardAttachments($key);
 
         }
 
-        return $attachments_keys->get($key);
+        return $this->attachments->keyBy('key')->get($key, new Attachment);
+
+    }
+
+    private function getWildcardAttachments($key) {
+
+        $first_part_key = $this->getWildcardFirstPartKey($key);
+        $model = $this->getCurrentClassName();
+        $model_id = $this->id;
+        $attachments = Attachment::where('model', $model)
+            ->where('model_id', $model_id)
+            ->where('key', 'LIKE', $first_part_key .'.%')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        foreach ($attachments as $index => $attachment) {
+
+            $new_key = $first_part_key .'.'. $index;
+
+            if($attachment->key != $new_key) {
+
+                $attachment->key = $new_key;
+                $attachment->save();
+
+            }
+
+        }
+
+        return $attachments;
+
+    }
+
+    private function isWildcardKey($key) {
+
+	    return ends_with($key, '.*');
+
+    }
+
+    private function getWildcardFirstPartKey($key) {
+
+	    $keys = explode('.', $key);
+        array_pop($keys);
+        return implode('.', $keys);
+
+    }
+
+    private function getWildcardKey($key) {
+
+        $attachments = $this->getWildcardAttachments($key);
+        return $this->getWildcardFirstPartKey($key) .'.'. $attachments->count();
 
     }
 
