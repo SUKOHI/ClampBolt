@@ -1,6 +1,6 @@
 # ClampBolt
 A Laravel package to attach/detach files to/from model.  
-(This maintained in L5.6)
+(This package is maintained under L5.6)
 
 # Installation
 
@@ -59,6 +59,17 @@ Now you can use new methods called `attach()` and `detach()`.
         'attachment_key_2' => '/PATH/TO/YOUR/FILE2',
         'attachment_key_3' => '/PATH/TO/YOUR/FILE3'
     ]);
+
+[Wildcard]:  
+You can use `wildcard key` like so.
+
+    $item->attach('photos.*', $path);
+    $item->save();
+    
+In this case, this package will automatically generate attachment key like `photos.0`.
+
+Note: Wildcard key is renamed when attaching a new file and retrieving attachments having a specific wildcard key.
+It means that wildcard key is NOT renamed when deleting.
 
 [Parameters]: You can add parameters to each attachments.
     
