@@ -399,21 +399,24 @@ trait ClampBoltTrait {
             ->where('key', 'LIKE', $first_part_key .'.%')
             ->orderBy('id', 'asc')
             ->get();
+        $filtered_attachments = $attachments->filter(function($attachment) use($key) {
 
-        foreach ($attachments as $index => $attachment) {
+            return ($this->matchWildcardKeys($key, $attachment->key));
+
+        });
+
+        $index = 0;
+
+        foreach ($filtered_attachments as $attachment) {
 
             $new_key = $first_part_key .'.'. $index;
-
-            if($attachment->key != $new_key) {
-
-                $attachment->key = $new_key;
-                $attachment->save();
-
-            }
+            $attachment->key = $new_key;
+            $attachment->save();
+            $index++;
 
         }
 
-        return $attachments;
+        return $filtered_attachments;
 
     }
 
@@ -425,11 +428,9 @@ trait ClampBoltTrait {
 
     private function matchWildcardKeys($key_1, $key_2) {
 
-        $keys_1 = explode('.', $key_1);
-        $keys_2 = explode('.', $key_2);
         $first_key_1 = $this->getWildcardFirstPartKey($key_1);
         $first_key_2 = $this->getWildcardFirstPartKey($key_2);
-        return (count($keys_1) == count($keys_2) && $first_key_1 == $first_key_2);
+        return ($first_key_1 == $first_key_2);
 
     }
 

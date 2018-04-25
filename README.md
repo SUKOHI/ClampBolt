@@ -60,17 +60,6 @@ Now you can use new methods called `attach()` and `detach()`.
         'attachment_key_3' => '/PATH/TO/YOUR/FILE3'
     ]);
 
-[Wildcard]:  
-You can use `wildcard key` like so.
-
-    $item->attach('photos.*', $path);
-    $item->save();
-    
-In this case, this package will automatically generate attachment key like `photos.0`.
-
-Note: Wildcard key is renamed when attaching a new file and retrieving attachments having a specific wildcard key.
-It means that wildcard key is NOT renamed when deleting.
-
 [Parameters]: You can add parameters to each attachments.
     
     $parameters = [
@@ -240,6 +229,25 @@ You can call `attached` and `detached` events.
         }
 
 Note: the first argument of constructor is `$attachment` instance. Not parent model instance.
+
+# Wildcard key
+
+You can use `wildcard key` to attach file(s) like so.
+
+    $item->attach('photos.*', $path);
+    $item->save();
+    
+In this case, this package will automatically generate attachment key like `photos.0` or `photos.1`.  
+
+Then you can retrieve and detach your attachments through wildcard key like so.
+
+    // Retrieve
+    $attachments = $item->getAttachment('photos.*');
+
+    // Detach
+    $item->detach('photos.*');
+    $user->save();
+
 
 # License
 

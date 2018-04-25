@@ -35,7 +35,7 @@ class Attachment extends Model
 
         if(!file_exists($full_path)) {
 
-            throw new Exception('File not exists.');
+            throw new \Exception('File not exists.');
 
         }
 
@@ -49,7 +49,7 @@ class Attachment extends Model
 
         if(!file_exists($full_path)) {
 
-            throw new Exception('File not exists.');
+            throw new \Exception('File not exists.');
 
         }
 
