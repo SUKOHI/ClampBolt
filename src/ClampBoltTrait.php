@@ -445,7 +445,19 @@ trait ClampBoltTrait {
     private function getWildcardKey($key) {
 
         $attachments = $this->getWildcardAttachments($key);
-        return $this->getWildcardFirstPartKey($key) .'.'. $attachments->count();
+        $attachments_count = $attachments->count();
+
+        foreach (array_keys($this->clamp_bolt_attachments) as $attachment_key) {
+
+            if($this->matchWildcardKeys($key, $attachment_key)) {
+
+                $attachments_count++;
+
+            }
+
+        }
+
+        return $this->getWildcardFirstPartKey($key) .'.'. $attachments_count;
 
     }
 
