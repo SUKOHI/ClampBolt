@@ -238,8 +238,13 @@ You can use `wildcard key` to attach file(s) like so.
     $item->save();
     
 In this case, this package will automatically generate attachment key like `photos.0` or `photos.1`.  
+You also can multiply attach files.
 
-Then you can retrieve and detach your attachments through wildcard key like so.
+    $item->attach('photos.*', $path_1);
+    $item->attach('photos.*', $path_2);
+    $item->save();
+
+And wildcard key is available for retrieving and detach files like so.
 
     // Retrieve
     $attachments = $item->getAttachment('photos.*');
