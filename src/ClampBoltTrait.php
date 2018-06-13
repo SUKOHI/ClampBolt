@@ -306,7 +306,7 @@ trait ClampBoltTrait {
 
 	public function attachments() {
 
-		return $this->hasMany('Sukohi\ClampBolt\App\Attachment', 'model_id', 'id');
+		return $this->hasMany('Sukohi\ClampBolt\App\Attachment', 'model_id', 'id')->where('model', $this->getCurrentClassName());
 
 	}
 
