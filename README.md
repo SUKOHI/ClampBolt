@@ -77,7 +77,7 @@ If you directly set `Request` parameter like the below, ClampBolt will automatic
 
     public function upload(Request $request, Item $item) {
 
-        $item->attach('attachment_key', $request->photo);
+        $item->attach('attachment_key', $request->file('photo'));
         $item->save();
 
     }
@@ -89,13 +89,18 @@ I mean in the same folder.
     
     public function upload(Request $request, Item $item) {
 
-        $item->attach('photos.1', $request->photo_1);
-        $item->attach('photos.2', $request->photo_2);
-        $item->attach('photos.3', $request->photo_3);
+        $item->attach('photos.1', $request->file('photo_1'));
+        $item->attach('photos.2', $request->file('photo_2'));
+        $item->attach('photos.3', $request->file('photo_3'));
+        $item->save();
+        
+        // or 
+        
+        $item->attach('photos.*', $path); // Refer to "Wildcard key"
         $item->save();
 
     }
-
+    
 
 [Deleting old file]: If you'd like to delete old file, set `true` in the 4th argument.
 
@@ -253,6 +258,15 @@ And wildcard key is available for retrieving and detach files like so.
     $item->detach('photos.*');
     $user->save();
 
+# Set directory
+
+If you'd like to save your uploaded file in a specific directory, use `setAttachmentDir`.
+
+    $user->setAttachmentDir('public/nested_1/nested_2/nested_3');
+    $user->attach('attachment_key', $request->file('profile'));
+    $user->save();
+    
+In this case, the file will be stored in `/storage/app/public/nested_1/nested_2/nested_3/attachment_key/`.
 
 # License
 
