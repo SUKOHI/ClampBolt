@@ -264,7 +264,7 @@ And wildcard key is available for retrieving and detach files like so.
 
 # Set directory
 
-If you'd like to save your uploaded file in a specific directory, use `setAttachmentDir`.
+If you'd like to save your uploaded file in a specific directory, use `setAttachmentDir()`.
 
     $user->setAttachmentDir('public/nested_1/nested_2/nested_3');
     $user->attach('attachment_key', $request->file('profile'));
