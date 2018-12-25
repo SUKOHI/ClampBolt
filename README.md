@@ -8,10 +8,10 @@ Execute composer command.
 
     composer require sukohi/clamp-bolt:4.*
 
-Register the service provider in app.php if your Laravel version is less than 5.4.
+Register `ClampBoltServiceProvider` in `app.php` if your Laravel version is less than 5.4.
 
     'providers' => [
-        ...Others...,  
+        // ...Others...,  
         Sukohi\ClampBolt\ClampBoltServiceProvider::class,
     ]
 
@@ -22,7 +22,7 @@ First of all, execute `publish` and `migrate` command.
     php artisan vendor:publish --provider="Sukohi\ClampBolt\ClampBoltServiceProvider"
     php artisan migrate
 
-And set `ClampBoltTrait` into your model like so.
+And set `ClampBoltTrait` into your model.
 
     use Sukohi\ClampBolt\ClampBoltTrait;
     
@@ -32,11 +32,11 @@ And set `ClampBoltTrait` into your model like so.
     }
     
 That's all.  
-Now you can use new methods called `attach()` and `detach()`.
+Now your model has 2 methods called `attach()` and `detach()`.
 
 # Usage
 
-***Attachment***
+## Attachment
     
 [Basic way]:  
     
@@ -60,7 +60,9 @@ Now you can use new methods called `attach()` and `detach()`.
         'attachment_key_3' => '/PATH/TO/YOUR/FILE3'
     ]);
 
-[Parameters]: You can add parameters to each attachments.
+[Parameters]: 
+
+You can add parameters to each attachments.
     
     $parameters = [
         'key_1' => 'value_1', 
@@ -71,7 +73,7 @@ Now you can use new methods called `attach()` and `detach()`.
     $item->attach('attachment_key', '/PATH/TO/YOUR/FILE', $parameters);
     $item->save();
 
-[Auto-Saving]
+[Auto-Saving]:
 
 If you directly set `Request` parameter like the below, ClampBolt will automatically save the file in `storage` folder.
 
@@ -82,9 +84,9 @@ If you directly set `Request` parameter like the below, ClampBolt will automatic
 
     }
     
-[Note]: The file path is `/storage/app/attachment_key/` in this case.
+Note: The file path is `/storage/app/attachment_key/` in this case.
 
-And if you use dot notation like so, all of the files will be saved in `photos`.  
+And if you use dot notation as follows, all of the files will be saved in `photos`.  
 I mean in the same folder.
     
     public function upload(Request $request, Item $item) {
@@ -100,13 +102,37 @@ I mean in the same folder.
         $item->save();
 
     }
-    
 
-[Deleting old file]: If you'd like to delete old file, set `true` in the 4th argument.
+[Wildcard key]:
+
+You can use `*` to attach file(s).
+
+    $item->attach('photos.*', $path);
+    $item->save();
+    
+In this case, this package will automatically save new attachment key like `photos.0` or `photos.1`.  
+You also can multiply attach files.
+
+    $item->attach('photos.*', $path_1);
+    $item->attach('photos.*', $path_2);
+    $item->save();
+
+And wildcard key is available for retrieving and detach files.
+
+    // Retrieve
+    $attachments = $item->getAttachment('photos.*');
+
+    // Detach
+    $item->detach('photos.*');
+    $user->save();
+
+[Deleting old file]:  
+
+If you'd like to delete old file, set `true` in the 4th argument.
 
     $item->attach('attachment_key', '/PATH/TO/YOUR/NEW/FILE', [], true);
 
-**Detachment**  
+## Detachment 
 
 [Basic way]:  
 
@@ -149,7 +175,7 @@ I mean in the same folder.
     $item->save();
     
 
-**Retrieve attachment** 
+## Retrieve attachment
 
     $item = \App\Item::find(1);
     $attachment = $item->getAttachment($key);
@@ -169,11 +195,11 @@ I mean in the same folder.
     echo $attachment->created_at;   // DateTime
     echo $attachment->updated_at;   // DateTime
 
-[Note]: `public_url` attribute is availabe if the file is stored in /storage/public. This means that you need to make a symbolic link in your Laravel app.  
+Note: `public_url` attribute is availabe if the file is stored in /storage/public. This means that you need to make a symbolic link in your Laravel app.  
 See [here](https://laravel.com/docs/5.7/filesystem#the-public-disk).
 
 
-You also can get all attachments at once like so.
+You also can get all attachments at once as follows.
 
     $item = \App\Item::find(1);
     
@@ -191,10 +217,10 @@ or
     // Paths
     $paths = $item->attachment_paths;
     
-* If you use "dot-notation" like `array_key.0` for attachment key, `attachment_filenames` and `attachment_paths` attributes return multi-dimensional array.
+* If you use `dot-notation` like `array_key.0` for attachment key, `attachment_filenames` and `attachment_paths` attributes return multi-dimensional array.
 
-**Check if attachment exists**
-    
+## Check if attachment exists
+
     $key = 'YOUR-KEY';
     
     if($item->hasAttachment($key)) {
@@ -204,18 +230,21 @@ or
     }
 
 
-**Download**
+## Download
 
+Call `download()` in your controller or routing.
 
-    return $item->getAttachment($key)->download();  
+    return $attachment->download();
 
     // or
     
-    return $item->getAttachment($key)->download('filename.jpg');  
+    return $attachment->download('filename.jpg');  
 
-**Response**
+## Response
 
-    return $item->getAttachment($key)->response();  
+Call `response()` in your controller or routing.
+
+    return $attachment->response();  
 
 # Events
 
@@ -237,11 +266,11 @@ You can call `attached` and `detached` events.
             // Do someting..
         }
 
-[Note]: The first argument of constructor is `$attachment` instance. Not parent model instance.
+Note: The first argument of constructor is `$attachment` instance. Not parent model instance.
 
 # Commands
 
-## Clear all stored attachment files & their data
+## Clear attachment
 
 You can delete all attachment files and clear `attachments` table by running `attachment:clear` command.
 
@@ -251,28 +280,7 @@ Or without confirmation
 
     php artisan attachment:clear --force
 
-# Wildcard key
-
-You can use `wildcard key` to attach file(s) like so.
-
-    $item->attach('photos.*', $path);
-    $item->save();
-    
-In this case, this package will automatically generate attachment key like `photos.0` or `photos.1`.  
-You also can multiply attach files.
-
-    $item->attach('photos.*', $path_1);
-    $item->attach('photos.*', $path_2);
-    $item->save();
-
-And wildcard key is available for retrieving and detach files like so.
-
-    // Retrieve
-    $attachments = $item->getAttachment('photos.*');
-
-    // Detach
-    $item->detach('photos.*');
-    $user->save();
+Note: Folder will not be deleted.
 
 # Set directory
 
