@@ -7,7 +7,8 @@ trait ClampBoltTrait {
 
 	private $clamp_bolt_attachments = [],
 			$clamp_bolt_detachments = [],
-			$clamp_bolt_deletions = [];
+			$clamp_bolt_deletions = [],
+            $clamp_bolt_attachment_dir = '';
 
 	public function attach($key, $path = '', $parameters = [], $deleting_flag = false) {
 
@@ -219,11 +220,7 @@ trait ClampBoltTrait {
 
         if($file_path instanceof \Illuminate\Http\UploadedFile) {
 
-            $keys = explode('.', $key);
-            $first_key = $keys[0];
-            $filename = date('Ymd_His_') . str_random() .'.'. $file_path->extension();
-            $file_path->storeAs($first_key, $filename);
-            $path = storage_path('app/'. $first_key .'/'. $filename);
+            $path = $this->storeAttachment($key, $file_path);
 
         } else if(is_string($file_path)) {
 
@@ -232,6 +229,24 @@ trait ClampBoltTrait {
         }
 
         return $path;
+
+    }
+
+    private function storeAttachment($key, $file) {
+
+        $keys = explode('.', $key);
+        $filename = date('Ymd_His_') . str_random() .'.'. $file->extension();
+        $first_key = $keys[0];
+	    $storing_dir = $first_key;
+
+        if(!empty($this->clamp_bolt_attachment_dir)) {
+
+            $storing_dir = $this->clamp_bolt_attachment_dir .'/'. $first_key;
+
+        }
+
+        $file->storeAs($storing_dir, $filename);
+        return storage_path('app/'. $storing_dir .'/'. $filename);
 
     }
 
@@ -458,6 +473,18 @@ trait ClampBoltTrait {
         }
 
         return $this->getWildcardFirstPartKey($key) .'.'. $attachments_count;
+
+    }
+
+    public function setAttachmentDir($dir) {
+
+	    if(ends_with($dir, '/')) {
+
+            $dir = substr($dir, 0, -1);
+
+        }
+
+        $this->clamp_bolt_attachment_dir = $dir;
 
     }
 
