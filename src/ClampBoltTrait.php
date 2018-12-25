@@ -128,11 +128,11 @@ trait ClampBoltTrait {
 					$path = $this->clamp_bolt_attachments[$key]['path'];
 					$parameters = $this->clamp_bolt_attachments[$key]['parameters'];
 
-					if($attachment->full_path != $path) {
+					if($attachment->path != $path) {
 
                         if(isset($this->clamp_bolt_deletions[$key]) && $this->clamp_bolt_deletions[$key]) {
 
-                            @unlink($attachment->full_path);
+                            @unlink($attachment->path);
 
                         }
 
@@ -149,7 +149,7 @@ trait ClampBoltTrait {
 
 				if(isset($this->clamp_bolt_detachments[$key])) {
 
-					$path = $attachment->full_path;
+					$path = $attachment->path;
 
 					if($attachment->delete()) {
 
@@ -329,7 +329,16 @@ trait ClampBoltTrait {
 
 	public function getAttachmentFilenamesAttribute() {
 
-		$filenames = $this->attachments->lists('filename', 'key')->all();
+	    $filenames = [];
+
+        foreach ($this->attachments as $attachment) {
+
+            $key = $attachment->key;
+            $filename = $attachment->filename;
+            $filenames[$key] = $filename;
+
+	    }
+
 		return $this->convertMultiDimensionalArray($filenames);
 
 	}
@@ -338,10 +347,10 @@ trait ClampBoltTrait {
 
 		$paths = [];
 
-		foreach ($this->attachments as $index => $attachment) {
+		foreach ($this->attachments as $attachment) {
 
 			$key = $attachment->key;
-			$path = $attachment->full_path;
+			$path = $attachment->path;
 			$paths[$key] = $path;
 
 		}
