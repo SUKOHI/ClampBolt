@@ -17,12 +17,6 @@ class Attachment extends Model
 
     // Accessor
 
-    public function getFullPathAttribute() {
-
-        return $this->path;
-
-    }
-
     public function getPathAttribute() {
 
         if(!empty($this->dir) && !empty($this->filename)) {
@@ -32,6 +26,12 @@ class Attachment extends Model
         }
 
         return '';
+
+    }
+
+    public function getFullPathAttribute() {
+
+        return $this->path;
 
     }
 
@@ -55,29 +55,29 @@ class Attachment extends Model
 
     public function response() {
 
-        $full_path = $this->full_path;
+        $path = $this->path;
 
-        if(!file_exists($full_path)) {
+        if(!file_exists($path)) {
 
             throw new \Exception('File not exists.');
 
         }
 
-        return response()->file($full_path);
+        return response()->file($path);
 
     }
 
     public function download($name = '') {
 
-        $full_path = $this->full_path;
+        $path = $this->path;
 
-        if(!file_exists($full_path)) {
+        if(!file_exists($path)) {
 
             throw new \Exception('File not exists.');
 
         }
 
-        return response()->download($full_path, $name);
+        return response()->download($path, $name);
 
     }
 }
