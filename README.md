@@ -239,6 +239,18 @@ You can call `attached` and `detached` events.
 
 [Note]: The first argument of constructor is `$attachment` instance. Not parent model instance.
 
+# Commands
+
+## Clear all stored attachment files & their data
+
+You can delete all attachment files and clear `attachments` table by running `attachment:clear` command.
+
+    php artisan attachment:clear
+
+Or without confirmation
+
+    php artisan attachment:clear --force
+
 # Wildcard key
 
 You can use `wildcard key` to attach file(s) like so.

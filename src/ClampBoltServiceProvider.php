@@ -1,6 +1,7 @@
 <?php namespace Sukohi\ClampBolt;
 
 use Illuminate\Support\ServiceProvider;
+use Sukohi\ClampBolt\Commands\AttachmentClearCommand;
 
 class ClampBoltServiceProvider extends ServiceProvider {
 
@@ -18,6 +19,11 @@ class ClampBoltServiceProvider extends ServiceProvider {
      */
     public function boot()
     {
+        if($this->app->runningInConsole()) {
+            $this->commands([
+                AttachmentClearCommand::class
+            ]);
+        }
 		$this->publishes([
 			__DIR__.'/migrations/' => database_path('migrations')
 		], 'migrations');
