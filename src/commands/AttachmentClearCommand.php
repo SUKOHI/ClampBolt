@@ -3,7 +3,7 @@
 namespace Sukohi\ClampBolt\Commands;
 
 use Illuminate\Console\Command;
-use function PHPSTORM_META\type;
+use \Sukohi\ClampBolt\App\Attachment;
 
 class AttachmentClearCommand extends Command
 {
@@ -42,7 +42,7 @@ class AttachmentClearCommand extends Command
 
         if ($force || $this->confirm('Do you wish to continue?')) {
 
-            $attachments = \Sukohi\ClampBolt\App\Attachment::all();
+            $attachments = Attachment::all();
 
             foreach ($attachments as $attachment) {
 
@@ -52,11 +52,7 @@ class AttachmentClearCommand extends Command
 
                     $result = @unlink($path);
 
-                    if($result) {
-
-                        $attachment->delete();
-
-                    } else {
+                    if(!$result) {
 
                         $this->error("[Error]: Failed to delete an attached file.\n". $path);
                         $this->warn('Command stopped.');
@@ -68,6 +64,7 @@ class AttachmentClearCommand extends Command
 
             }
 
+            Attachment::truncate();
             $this->info('Done!');
 
         }
