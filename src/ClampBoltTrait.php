@@ -359,6 +359,27 @@ trait ClampBoltTrait {
 
 	}
 
+	public function getAttachmentPublicUrlsAttribute() {
+
+		$urls = [];
+
+		foreach ($this->attachments as $attachment) {
+
+			$key = $attachment->key;
+			$url = $attachment->public_url;
+
+			if(!empty($url)) {
+
+                $urls[$key] = $url;
+
+            }
+
+		}
+
+		return $this->convertMultiDimensionalArray($urls);
+
+	}
+
 	// Others
 
 	private function convertMultiDimensionalArray(array $values) {

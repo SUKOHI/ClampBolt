@@ -209,15 +209,23 @@ You also can get all attachments at once as follows.
     
     }
 
-or 
+[Filenames]:
 
-    // Filenames
     $filenames = $item->attachment_filenames;
-    
-    // Paths
+
+[Paths]:
+
     $paths = $item->attachment_paths;
+
+[Public URLs]
+
+    $public_urls = $item->attachment_public_urls;
     
-* If you use `dot-notation` like `array_key.0` for attachment key, `attachment_filenames` and `attachment_paths` attributes return multi-dimensional array.
+Note: 
+
+If you use `dot-notation` like `array_key.0` for attachment key, `attachment_filenames`, `attachment_paths` and `attachment_public_urls` attributes return multi-dimensional array.  
+And values of `attachment_public_urls` is empty if they are not stored in /storage/public.  
+See `Retrieve attachment` in this file.
 
 ## Check if attachment exists
 
