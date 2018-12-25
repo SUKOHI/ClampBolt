@@ -1,6 +1,6 @@
 # ClampBolt
 A Laravel package to attach/detach files to/from model.  
-(This package is maintained under L5.6)
+(This package is maintained under L5.7)
 
 # Installation
 
@@ -82,7 +82,7 @@ If you directly set `Request` parameter like the below, ClampBolt will automatic
 
     }
     
-[Note:] The file path is `/storage/app/attachment_key/` in this case.
+[Note]: The file path is `/storage/app/attachment_key/` in this case.
 
 And if you use dot notation like so, all of the files will be saved in `photos`.  
 I mean in the same folder.
@@ -164,9 +164,13 @@ I mean in the same folder.
     echo $attachment->extension;
     echo $attachment->mime_type;
     echo $attachment->size;
+    echo $attachment->public_url;
     echo $attachment->parameters;   // Array
     echo $attachment->created_at;   // DateTime
     echo $attachment->updated_at;   // DateTime
+
+[Note]: `public_url` attribute is availabe if the file is stored in /storage/public. This means that you need to make a symbolic link in your Laravel app.  
+See [here](https://laravel.com/docs/5.7/filesystem#the-public-disk).
 
 
 You also can get all attachments at once like so.
@@ -233,7 +237,7 @@ You can call `attached` and `detached` events.
             // Do someting..
         }
 
-Note: the first argument of constructor is `$attachment` instance. Not parent model instance.
+[Note]: The first argument of constructor is `$attachment` instance. Not parent model instance.
 
 # Wildcard key
 
@@ -265,7 +269,7 @@ If you'd like to save your uploaded file in a specific directory, use `setAttach
     $user->setAttachmentDir('public/nested_1/nested_2/nested_3');
     $user->attach('attachment_key', $request->file('profile'));
     $user->save();
-    
+
 In this case, the file will be stored in `/storage/app/public/nested_1/nested_2/nested_3/attachment_key/`.
 
 # License

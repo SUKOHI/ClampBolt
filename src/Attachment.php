@@ -35,6 +35,24 @@ class Attachment extends Model
 
     }
 
+    public function getPublicUrlAttribute() {
+
+        $storage_public_path = storage_path('app/public');
+
+        if(starts_with($this->path, $storage_public_path)) {
+
+            $pattern = '|^'. $storage_public_path .'|';
+            $public_path = 'storage'. preg_replace($pattern, '', $this->path);
+            return url($public_path);
+
+        }
+
+        return '';
+
+    }
+
+    // Others
+
     public function response() {
 
         $full_path = $this->full_path;
