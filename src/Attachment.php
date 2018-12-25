@@ -19,6 +19,12 @@ class Attachment extends Model
 
     public function getFullPathAttribute() {
 
+        return $this->path;
+
+    }
+
+    public function getPathAttribute() {
+
         if(!empty($this->dir) && !empty($this->filename)) {
 
             return $this->dir .'/'. $this->filename;
