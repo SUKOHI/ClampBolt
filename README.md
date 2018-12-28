@@ -290,6 +290,13 @@ Or without confirmation
 
 Note: Folder will not be deleted.
 
+# When deleting
+
+This package detaches all of attachment data corresponding to a record that you are deleting.
+If you also would like to delete attachment files, set `true` in the 1st argument.
+
+    $item->delete(true);
+
 # Set directory
 
 If you'd like to save your uploaded file in a specific directory, use `setAttachmentDir()`.

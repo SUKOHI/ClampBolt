@@ -285,35 +285,11 @@ trait ClampBoltTrait {
 
 	}
 
-	public function delete() {
+	public function delete($deleting_flag = false) {
 
-		\DB::beginTransaction();
-
-		try {
-
-			parent::delete();
-			$model = $this->getCurrentClassName();
-			$model_id = $this->id;
-            Attachment::where('model', $model)
-				->where('model_id', $model_id)
-				->delete();
-			\DB::commit();
-
-			if($this->attachments->count() > 0) {
-
-				$this->detachAll();
-
-			}
-
-			return true;
-
-		} catch (\Exception $e) {
-
-			\DB::rollBack();
-
-		}
-
-		return false;
+        $this->detachAll($deleting_flag);
+        $this->saveAttachments();
+        return parent::delete();
 
 	}
 
