@@ -11,9 +11,8 @@ class Attachment extends Model
      *
      * @var array
      */
-    protected $casts = [
-        'parameters' => 'array',
-    ];
+    protected $casts = ['parameters' => 'array'];
+    protected $appends = ['public_url'];
 
     // Accessor
 
