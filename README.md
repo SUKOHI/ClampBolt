@@ -229,11 +229,17 @@ See `Retrieve attachment` in this file.
 
 ## Check if attachment exists
 
-    $key = 'YOUR-KEY';
-    
-    if($item->hasAttachment($key)) {
+    if($item->hasAttachment('attachment_key')) {
 
-        $attachment = $item->getAttachment($key);
+        // has it!
+
+    }
+    
+    // or multiply
+    
+    if($item->hasAttachment('attachment_key.*')) {
+
+        // has it!
 
     }
 

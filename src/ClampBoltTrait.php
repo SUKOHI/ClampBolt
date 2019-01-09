@@ -394,6 +394,24 @@ trait ClampBoltTrait {
 
 	public function hasAttachment($key) {
 
+	    if(ends_with($key, '.*')) {
+
+            foreach($this->attachments as $attachment) {
+
+                $pattern = '|^'. substr($key, 0, -2) .'\.[0-9]+$|';
+
+                if(preg_match($pattern, $attachment->key)) {
+
+                    return true;
+
+                }
+
+	        }
+
+            return false;
+
+        }
+
         return $this->attachments->contains('key', $key);
 
     }
