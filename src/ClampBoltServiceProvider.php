@@ -1,4 +1,6 @@
-<?php namespace Sukohi\ClampBolt;
+<?php
+
+namespace Sukohi\ClampBolt;
 
 use Illuminate\Support\ServiceProvider;
 use Sukohi\ClampBolt\Commands\AttachmentClearCommand;

@@ -1,6 +1,6 @@
-<?php namespace
+<?php
 
-Sukohi\ClampBolt;
+namespace Sukohi\ClampBolt;
 
 use Sukohi\ClampBolt\App\Attachment;
 use Sukohi\ClampBolt\App\PublicAttachment;
