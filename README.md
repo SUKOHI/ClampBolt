@@ -296,6 +296,25 @@ Or without confirmation
 
 Note: Folder will not be deleted.
 
+# Relationship
+
+You have two relationships called `attachments` and `public_attachments`.  
+The first one has all of data but `public_attachments` has only some data so that you can publish even for visitors like ajax data.  
+The keys are as follows.
+
+* id
+* model_id
+* key
+* filename
+* extension
+* mime_type
+* parameters
+* public_url
+
+And usage with `public_attachments`.  
+
+    $user = \App\User::with('public_attachments')->find(1);
+
 # When deleting
 
 This package detaches all of attachment data corresponding to a record that you are deleting.
