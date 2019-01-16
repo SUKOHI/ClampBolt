@@ -3,6 +3,7 @@
 Sukohi\ClampBolt;
 
 use Sukohi\ClampBolt\App\Attachment;
+use Sukohi\ClampBolt\App\PublicAttachment;
 use Symfony\Component\HttpFoundation\File\File;
 
 trait ClampBoltTrait {
@@ -300,6 +301,13 @@ trait ClampBoltTrait {
 	public function attachments() {
 
 		return $this->hasMany(Attachment::class, 'model_id', 'id')
+            ->where('model', $this->getCurrentClassName());
+
+	}
+
+	public function public_attachments() {
+
+		return $this->hasMany(PublicAttachment::class, 'model_id', 'id')
             ->where('model', $this->getCurrentClassName());
 
 	}

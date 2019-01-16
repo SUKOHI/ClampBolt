@@ -9,4 +9,5 @@ return array(
     'Sukohi\\ClampBolt\\App\\Attachment' => $baseDir . '/src/Attachment.php',
     'Sukohi\\ClampBolt\\ClampBoltServiceProvider' => $baseDir . '/src/ClampBoltServiceProvider.php',
     'Sukohi\\ClampBolt\\ClampBoltTrait' => $baseDir . '/src/ClampBoltTrait.php',
+    'Sukohi\\ClampBolt\\Commands\\AttachmentClearCommand' => $baseDir . '/src/commands/AttachmentClearCommand.php',
 );
