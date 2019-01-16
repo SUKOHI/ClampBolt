@@ -1,4 +1,6 @@
-<?php namespace Sukohi\ClampBolt;
+<?php namespace
+
+Sukohi\ClampBolt;
 
 use Sukohi\ClampBolt\App\Attachment;
 use Symfony\Component\HttpFoundation\File\File;
@@ -297,7 +299,8 @@ trait ClampBoltTrait {
 
 	public function attachments() {
 
-		return $this->hasMany('Sukohi\ClampBolt\App\Attachment', 'model_id', 'id')->where('model', $this->getCurrentClassName());
+		return $this->hasMany(Attachment::class, 'model_id', 'id')
+            ->where('model', $this->getCurrentClassName());
 
 	}
 
