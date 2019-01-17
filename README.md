@@ -186,7 +186,7 @@ If you'd like to delete old file, set `true` in the 4th argument.
     echo $attachment->key;
     echo $attachment->dir;
     echo $attachment->filename;
-    echo $attachment->full_path;
+    echo $attachment->path;
     echo $attachment->extension;
     echo $attachment->mime_type;
     echo $attachment->size;
@@ -298,6 +298,8 @@ Note: Folder will not be deleted.
 
 # Relationship
 
+## ClampBoltTrait
+
 You have two relationships called `attachments` and `public_attachments`.  
 The first one has all of data but `public_attachments` has only some data so that you can publish even for visitors like ajax data.  
 The keys are as follows.
@@ -314,6 +316,16 @@ The keys are as follows.
 And usage with `public_attachments`.  
 
     $user = \App\User::with('public_attachments')->find(1);
+
+## Attachment
+
+    $user = \App\User::find(1);
+
+    foreach($user->attachments as $attachment) {
+
+        $parent = $attachment->parent;  // \App\User
+
+    }
 
 # When deleting
 

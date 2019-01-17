@@ -14,6 +14,14 @@ class Attachment extends Model
     protected $casts = ['parameters' => 'array'];
     protected $appends = ['public_url'];
 
+    // Relationship
+
+    public function parent() {
+
+        return $this->belongsTo($this->model, 'model_id', 'id');
+
+    }
+
     // Accessor
 
     public function getPathAttribute() {
