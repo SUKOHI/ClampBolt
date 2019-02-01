@@ -12,7 +12,7 @@ class ClampBoltServiceProvider extends ServiceProvider {
      *
      * @var  bool
      */
-    protected $defer = true;
+    protected $defer = false;
 
     /**
      * Bootstrap the application events.
@@ -74,6 +74,9 @@ class ClampBoltServiceProvider extends ServiceProvider {
      */
     public function register()
     {
+        $this->app->singleton('clamp-bolt', function ($app) {
+            return null;
+        });
     }
 
     /**
