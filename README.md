@@ -282,6 +282,27 @@ You can call `attached` and `detached` events.
 
 Note: The first argument of constructor is `$attachment` instance. Not parent model instance.
 
+# Validation rule
+
+#### total_attachment:table,id,attachment_key,min,max,detaching_count
+
+The total number of files under validation must be between `:min` and `:max`.  
+This total number is including files that already be stored in your app.
+
+    'photos' => 'total_attachment:users,1,photos,1,5'
+
+Add `detaching_count` at the end of the parameters if you are detaching file at the same time of attaching.
+
+    'photos' => 'total_attachment:users,1,photos,1,5,3'
+
+Then add an error message in `/resources/lang/**/validation.php`.
+
+    // en
+    'total_attachment' => 'The total number of :attribute must be between :min and :max.'
+
+    // ja
+    'total_attachment' => ':attributeの全件数は、:min個から:max個にしてください。'
+
 # Commands
 
 ## Clear attachment
