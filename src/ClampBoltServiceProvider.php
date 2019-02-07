@@ -55,8 +55,15 @@ class ClampBoltServiceProvider extends ServiceProvider {
             if(class_exists($model_name)) {
 
                 $model = with(new $model_name)->find($model_id);
-                $attachments = $model->getAttachment($attachment_key .'.*');
-                $attachment_count = $attachments->count();
+                $attachment_count = 0;
+
+                if(!is_null($model)) {
+
+                    $attachments = $model->getAttachment($attachment_key .'.*');
+                    $attachment_count = $attachments->count();
+
+                }
+
                 $total = $attachment_count + $adding_count - $detaching_count;
                 return ($total >= $min && $total <= $max);
 
