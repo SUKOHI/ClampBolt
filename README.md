@@ -282,6 +282,16 @@ You can call `attached` and `detached` events.
 
 Note: The first argument of constructor is `$attachment` instance. Not parent model instance.
 
+# Where clause
+
+`whereHasAttachment()` allows you to retrieve item(s) that have at least one attachment .
+
+    $users = \App\User::whereHasAttachment('attachment_key')->get();
+
+or you can use wildcard as follows.
+
+    $users = \App\User::whereHasAttachment('attachment_key.*')->get();
+
 # Validation rule
 
 #### total_attachment:table,id,attachment_key,min,max,detaching_count

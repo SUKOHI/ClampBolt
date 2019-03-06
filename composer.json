@@ -1,6 +1,6 @@
 {
     "name": "sukohi/clamp-bolt",
-    "description": "A Laravel package to attach/detach files to/from model.",
+    "description": "A Laravel package to attach/detach files.",
     "authors": [
         {
             "name": "Sukohi",

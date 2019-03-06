@@ -312,6 +312,25 @@ trait ClampBoltTrait {
 
 	}
 
+	// Scope
+    public function scopeWhereHasAttachment($query, $key) {
+
+        $query->whereHas('attachments', function($query) use($key) {
+
+            if(ends_with($key, '.*')) {
+
+                $query->where('key', 'LIKE', rtrim($key, '*') .'%');
+
+            } else {
+
+                $query->where('key', $key);
+
+            }
+
+        });
+
+    }
+
 	// Accessors
 
 	public function getAttachmentFilenamesAttribute() {
