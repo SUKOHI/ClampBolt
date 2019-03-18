@@ -6,11 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Attachment extends Model
 {
-    /**
-     * The attributes that should be casted to native types.
-     *
-     * @var array
-     */
     protected $casts = ['parameters' => 'array'];
     protected $appends = ['public_url'];
 
@@ -85,6 +80,35 @@ class Attachment extends Model
         }
 
         return response()->download($path, $name);
+
+    }
+
+    public function thumbnail($width, $height) {
+
+        if(!starts_with($this->mime_type, 'image/')) {
+
+            throw new \Exception('This is not an image file.');
+
+        }
+
+        $image = \Image::make($this->path);
+        $thumbnail_key = $this->key .'_thumbnail_'. $width .'x'. $height;
+        $thumbnail_path = str_replace(
+            '.',
+            '_thumbnail_'. $width .'x'. $height .'.',
+            $this->path
+        );
+        $image->fit($width, $height)
+            ->save($thumbnail_path);
+
+        $model = $this->parent;
+        $model->attach(
+            $thumbnail_key,
+            $thumbnail_path,
+            ['parent_attachment_key' => $this->key],
+            true
+        );
+        $model->save();
 
     }
 }

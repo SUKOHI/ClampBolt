@@ -54,9 +54,7 @@ class AttachmentClearCommand extends Command
 
                     if(!$result) {
 
-                        $this->error("[Error]: Failed to delete an attached file.\n". $path);
-                        $this->warn('Command stopped.');
-                        die();
+                        $this->warn("[Error]: Failed to delete.\n\n". $path);
 
                     }
 

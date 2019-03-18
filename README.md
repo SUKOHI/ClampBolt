@@ -358,6 +358,30 @@ And usage with `public_attachments`.
 
     }
 
+# Thumbnail
+
+You can generate thumbnail if attaching file is image as follows.
+
+    $user->attach('image', $file, [], true)->thumbnail([
+        '500x300',
+        '300x300'
+    ]);
+    
+In this case, the attachment keys are `image_thumbnail_500x300` and `image_thumbnail_300x300`.
+
+Of course, wildcard is available.
+
+    $user->attach('photos.*', $file, [], true)->thumbnail([
+        '700x500',
+        '150x150'
+    ]);
+
+Or Attachment also has `thumbnail()`.
+
+    $width = 500;
+    $height = 300;
+    $attachment->thumbnail($width, $height);
+
 # When deleting
 
 This package detaches all of attachment data corresponding to a record that you are deleting.
