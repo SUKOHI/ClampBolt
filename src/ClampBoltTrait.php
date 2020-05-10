@@ -5,6 +5,7 @@ namespace Sukohi\ClampBolt;
 use Sukohi\ClampBolt\App\Attachment;
 use Sukohi\ClampBolt\App\PublicAttachment;
 use Symfony\Component\HttpFoundation\File\File;
+use Illuminate\Support\Str;
 
 trait ClampBoltTrait {
 
@@ -375,7 +376,7 @@ trait ClampBoltTrait {
 
         $query->whereHas('attachments', function($query) use($key) {
 
-            if(ends_with($key, '.*')) {
+            if(Str::endsWith($key, '.*')) {
 
                 $query->where('key', 'LIKE', rtrim($key, '*') .'%');
 
@@ -482,7 +483,7 @@ trait ClampBoltTrait {
 
     public function hasAttachment($key) {
 
-        if(ends_with($key, '.*')) {
+        if(Str::endsWith($key, '.*')) {
 
             foreach($this->attachments as $attachment) {
 
@@ -549,7 +550,7 @@ trait ClampBoltTrait {
 
     private function isWildcardKey($key) {
 
-        return ends_with($key, '.*');
+        return Str::endsWith($key, '.*');
 
     }
 
@@ -590,7 +591,7 @@ trait ClampBoltTrait {
 
     public function setAttachmentDir($dir) {
 
-        if(ends_with($dir, '/')) {
+        if(Str::endsWith($dir, '/')) {
 
             $dir = substr($dir, 0, -1);
 
