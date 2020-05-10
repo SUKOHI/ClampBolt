@@ -278,7 +278,7 @@ trait ClampBoltTrait {
     private function storeAttachment($key, $file) {
 
         $keys = explode('.', $key);
-        $filename = date('Ymd_His_') . str_random() .'.'. $file->extension();
+        $filename = date('Ymd_His_') . Str::random() .'.'. $file->extension();
         $first_key = $keys[0];
         $storing_dir = $first_key;
 
