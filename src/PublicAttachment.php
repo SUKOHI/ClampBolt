@@ -3,6 +3,7 @@
 namespace Sukohi\ClampBolt\App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class PublicAttachment extends Model
 {
@@ -49,7 +50,7 @@ class PublicAttachment extends Model
 
         $storage_public_path = storage_path('app/public');
 
-        if(starts_with($this->path, $storage_public_path)) {
+        if(Str::startsWith($this->path, $storage_public_path)) {
 
             $pattern = '|^'. $storage_public_path .'|';
             $public_path = 'storage'. preg_replace($pattern, '', $this->path);

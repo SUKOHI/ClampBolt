@@ -3,6 +3,7 @@
 namespace Sukohi\ClampBolt\App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Attachment extends Model
 {
@@ -41,7 +42,7 @@ class Attachment extends Model
 
         $storage_public_path = storage_path('app/public');
 
-        if(starts_with($this->path, $storage_public_path)) {
+        if(Str::startsWith($this->path, $storage_public_path)) {
 
             $pattern = '|^'. $storage_public_path .'|';
             $public_path = 'storage'. preg_replace($pattern, '', $this->path);
@@ -85,7 +86,7 @@ class Attachment extends Model
 
     public function thumbnail($width, $height) {
 
-        if(!starts_with($this->mime_type, 'image/')) {
+        if(!Str::startsWith($this->mime_type, 'image/')) {
 
             throw new \Exception('This is not an image file.');
 
