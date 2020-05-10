@@ -1,5 +1,5 @@
 # ClampBolt
-A Laravel package to attach/detach files to/from model.  
+A Laravel package that allows you to attach/detach files to/from model.  
 (This package is maintained under L6.x)
 
 # Installation
