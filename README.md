@@ -1,12 +1,12 @@
 # ClampBolt
 A Laravel package to attach/detach files to/from model.  
-(This package is maintained under L5.7)
+(This package is maintained under L6.x)
 
 # Installation
 
 Execute composer command.
 
-    composer require sukohi/clamp-bolt:4.*
+    composer require sukohi/clamp-bolt:5.*
 
 Register `ClampBoltServiceProvider` in `app.php` if your Laravel version is less than 5.4.
 
